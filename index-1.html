@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#FF6B35"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="ServiçosPerto"/>
+<meta name="description" content="Encontre profissionais autonomos perto de voce"/>
+<link rel="manifest" href="manifest.json"/>
+<title>ServiçosPerto</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--laranja:#FF6B35;--laranja2:#FF9F1C;--verde:#00C896;--fundo:#0A0A14;--card:#13131F;--card2:#1C1C2E;--texto:#F0F0FF;--sub:#8888AA;--borda:rgba(255,255,255,0.07);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'DM Sans',sans-serif;background:var(--fundo);color:var(--texto);min-height:100vh;overflow-x:hidden;font-size:16px;letter-spacing:0.3px;line-height:1.5;}
+h1,h2,h3,h4{font-family:'Syne',sans-serif;font-weight:700;letter-spacing:0.5px;}
+.tela{display:none;min-height:100vh;padding-bottom:80px;animation:fadeIn 0.3s ease;}
+.tela.ativa{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.nav-bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,20,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--borda);display:flex;justify-content:space-around;padding:10px 0 20px;z-index:100;}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 18px;border-radius:14px;transition:all 0.2s;border:none;background:none;}
+.nav-btn.ativo{background:rgba(255,107,53,0.15);}
+.nav-btn .icone{font-size:22px;}
+.nav-btn .label{font-size:10px;font-weight:600;color:var(--sub);font-family:'Syne',sans-serif;}
+.nav-btn.ativo .label{color:var(--laranja);}
+.header{background:linear-gradient(160deg,#1a0a00 0%,var(--fundo) 100%);padding:52px 20px 24px;}
+.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.geo-tag{display:flex;align-items:center;gap:6px;color:#9999BB;font-size:13px;letter-spacing:0.2px;margin-bottom:4px;}
+.geo-tag span{color:var(--laranja);}
+.avatar-btn{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--laranja),var(--laranja2));display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;border:none;}
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--card2);border-radius:16px;padding:13px 16px;margin:0 20px 24px;border:1px solid var(--borda);cursor:pointer;}
+.search-bar span{color:var(--sub);font-size:15px;letter-spacing:0.2px;}
+.banner{margin:0 20px 28px;background:linear-gradient(135deg,rgba(255,107,53,0.9) 0%,rgba(255,159,28,0.9) 100%);border-radius:22px;padding:28px 20px;position:relative;overflow:hidden;}
+.banner::before{content:'🔧';position:absolute;right:-15px;top:-15px;font-size:120px;opacity:0.08;transform:rotate(20deg);}
+.banner p{font-size:13px;color:rgba(255,255,255,0.85);margin-bottom:8px;font-weight:500;letter-spacing:0.3px;}
+.banner h2{font-size:22px;letter-spacing:0.5px;font-weight:800;color:#fff;margin-bottom:14px;line-height:1.2;}
+.btn-banner{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;font-weight:600;font-size:13px;padding:10px 20px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.secao-titulo{display:flex;justify-content:space-between;align-items:center;padding:0 20px;margin-bottom:14px;}
+.secao-titulo h3{font-size:18px;letter-spacing:0.5px;font-weight:700;}
+.secao-titulo a{color:var(--laranja);font-size:12px;font-weight:600;cursor:pointer;}
+.cats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 20px;margin-bottom:28px;}
+.cat-card{background:var(--card);border-radius:16px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;border:1px solid var(--borda);transition:transform 0.15s;}
+.cat-card:active{transform:scale(0.96);}
+.cat-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.cat-card span{font-size:11px;font-weight:600;color:#CCCCDD;text-align:center;}
+.lista-pros{padding:0 20px;display:flex;flex-direction:column;gap:12px;}
+.pro-card{background:var(--card);border-radius:18px;padding:16px;border:1px solid var(--borda);cursor:pointer;transition:transform 0.15s;}
+.pro-card:active{transform:scale(0.98);}
+.pro-card-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.pro-avatar{width:52px;height:52px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;position:relative;flex-shrink:0;}
+.online-dot{width:13px;height:13px;background:var(--verde);border-radius:50%;position:absolute;bottom:-1px;right:-1px;border:2px solid var(--card);}
+.pro-info{flex:1;}
+.pro-info h4{font-size:16px;letter-spacing:0.3px;font-weight:700;margin-bottom:2px;}
+.pro-info p{font-size:12px;color:var(--sub);margin-bottom:4px;}
+.stars{font-size:12px;color:#FFD700;}
+.stars span{color:var(--sub);}
+.pro-preco{font-weight:800;font-size:14px;color:var(--laranja);}
+.pro-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.tag{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;}
+.busca-header{padding:52px 20px 16px;}
+.busca-header h2{font-size:22px;font-weight:800;margin-bottom:16px;}
+.input-busca{display:flex;align-items:center;gap:10px;background:var(--card2);border-radius:16px;padding:12px 16px;border:1px solid var(--borda);margin-bottom:14px;}
+.input-busca input{background:none;border:none;color:var(--texto);font-size:14px;flex:1;outline:none;font-family:'DM Sans',sans-serif;}
+.input-busca input::placeholder{color:var(--sub);}
+.filtros{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none;}
+.filtros::-webkit-scrollbar{display:none;}
+.filtro-btn{border:1px solid var(--borda);background:var(--card);color:#9999BB;font-size:13px;letter-spacing:0.2px;font-weight:600;padding:7px 16px;border-radius:20px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.filtro-btn.ativo{background:var(--laranja);border-color:var(--laranja);color:#fff;}
+.geo-info{padding:0 20px;color:#9999BB;font-size:13px;letter-spacing:0.2px;margin-bottom:14px;}
+.perfil-header{padding:52px 20px 24px;background:linear-gradient(160deg,#2a1000 0%,var(--fundo) 100%);}
+.back-btn{background:var(--card2);border:none;color:var(--texto);width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;margin-bottom:20px;}
+.perfil-top{display:flex;gap:16px;align-items:center;}
+.perfil-avatar{width:76px;height:76px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:26px;}
+.perfil-nome{font-size:24px;letter-spacing:0.5px;font-weight:800;margin-bottom:4px;}
+.perfil-role{color:#9999BB;font-size:14px;letter-spacing:0.2px;margin-bottom:6px;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:20px;}
+.stat-box{background:var(--card);border-radius:15px;padding:14px 8px;text-align:center;border:1px solid var(--borda);}
+.stat-val{font-size:17px;font-weight:800;margin-bottom:4px;font-family:'Syne',sans-serif;}
+.stat-lbl{font-size:11px;color:var(--sub);}
+.secao-card{background:var(--card);border-radius:18px;padding:16px;margin:0 20px 14px;border:1px solid var(--borda);}
+.secao-card h4{font-size:14px;font-weight:700;margin-bottom:12px;}
+.avaliacao-item{padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--borda);}
+.avaliacao-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.av-top{display:flex;justify-content:space-between;margin-bottom:4px;}
+.av-nome{font-size:13px;font-weight:600;}
+.av-txt{font-size:12px;color:var(--sub);line-height:1.4;}
+.btn-contato{margin:0 20px 20px;padding:18px;border-radius:20px;border:none;font-size:16px;font-weight:800;color:#fff;cursor:pointer;font-family:'Syne',sans-serif;width:calc(100% - 40px);background:linear-gradient(135deg,var(--laranja),var(--laranja2));}
+.galeria-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.galeria-scroll::-webkit-scrollbar{display:none;}
+.galeria-foto{width:110px;height:110px;border-radius:14px;flex-shrink:0;overflow:hidden;position:relative;cursor:pointer;transition:transform 0.15s;border:1px solid var(--borda);}
+.galeria-foto:active{transform:scale(0.95);}
+.galeria-foto .foto-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;}
+.galeria-foto .foto-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.75));padding:6px 8px 8px;font-size:10px;font-weight:600;color:white;line-height:1.2;}
+.video-card{width:150px;height:100px;border-radius:14px;flex-shrink:0;position:relative;cursor:pointer;background:var(--card2);border:1px solid var(--borda);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;transition:transform 0.15s;}
+.video-card:active{transform:scale(0.95);}
+.video-play{font-size:28px;}
+.video-titulo{font-size:10px;font-weight:600;color:var(--sub);text-align:center;padding:0 8px;line-height:1.3;}
+.video-duracao{position:absolute;bottom:6px;right:8px;background:rgba(0,0,0,0.7);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;}
+.modal-foto{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:300;display:none;align-items:center;justify-content:center;flex-direction:column;padding:30px 20px;}
+.modal-foto.ativo{display:flex;}
+.modal-foto-img{width:100%;max-width:340px;border-radius:22px;height:280px;display:flex;align-items:center;justify-content:center;font-size:90px;background:var(--card2);border:1px solid var(--borda);}
+.modal-foto-desc{color:white;font-size:16px;margin-top:20px;text-align:center;font-weight:700;font-family:'Syne',sans-serif;}
+.modal-foto-sub{color:#9999BB;font-size:13px;letter-spacing:0.2px;margin-top:6px;text-align:center;}
+.modal-foto-close{position:absolute;top:52px;right:20px;background:var(--card2);border:1px solid var(--borda);color:white;width:42px;height:42px;border-radius:13px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.cad-header{padding:52px 20px 20px;}
+.cad-header h2{font-size:22px;font-weight:800;margin-bottom:4px;}
+.cad-header p{color:#9999BB;font-size:13px;letter-spacing:0.2px;}
+.cad-aviso{margin:0 20px 20px;background:rgba(0,200,150,0.1);border:1px solid rgba(0,200,150,0.3);border-radius:14px;padding:12px 14px;color:var(--verde);font-size:12px;font-weight:600;}
+.campo{padding:0 20px;margin-bottom:16px;}
+.campo label{display:block;color:#AAAACC;font-size:12px;font-weight:600;margin-bottom:6px;font-family:'Syne',sans-serif;}
+.campo input,.campo select,.campo textarea{width:100%;background:var(--card2);border:1px solid var(--borda);border-radius:13px;padding:13px 14px;color:var(--texto);font-size:14px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color 0.2s;}
+.campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--laranja);}
+.campo select{appearance:none;-webkit-appearance:none;}
+.campo textarea{resize:none;height:90px;}
+.foto-upload{margin:0 20px 20px;background:var(--card2);border:2px dashed rgba(255,107,53,0.35);border-radius:16px;padding:28px;text-align:center;cursor:pointer;}
+.foto-upload p:first-child{font-size:32px;margin-bottom:8px;}
+.foto-upload p:last-child{color:#9999BB;font-size:13px;letter-spacing:0.2px;}
+.btn-cadastrar{margin:0 20px 20px;width:calc(100% - 40px);padding:18px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--laranja),var(--laranja2));color:#fff;font-size:16px;font-weight:800;font-family:'Syne',sans-serif;cursor:pointer;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
+.modal-overlay.ativo{display:flex;}
+.modal-box{background:var(--card);border-radius:24px;padding:32px 24px;text-align:center;max-width:320px;width:100%;border:1px solid var(--borda);}
+.modal-box .emoji{font-size:52px;margin-bottom:16px;}
+.modal-box h3{font-size:20px;font-weight:800;margin-bottom:8px;}
+.modal-box p{color:#9999BB;font-size:14px;letter-spacing:0.2px;margin-bottom:24px;line-height:1.5;}
+.modal-btn{background:linear-gradient(135deg,var(--laranja),var(--laranja2));border:none;color:#fff;font-weight:800;font-size:15px;padding:14px 32px;border-radius:16px;cursor:pointer;font-family:'Syne',sans-serif;}
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="tela ativa" id="tela-home">
+  <div class="header">
+    <div class="header-top">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:46px;height:46px;flex-shrink:0;">
+          <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+            <circle cx="36" cy="36" r="36" fill="url(#lg1)"/>
+            <path d="M36 12C25.507 12 17 20.507 17 31C17 45 36 60 36 60C36 60 55 45 55 31C55 20.507 46.493 12 36 12Z" fill="white"/>
+            <path d="M43 22C41.2 20.2 38.6 19.5 36.2 20L38.8 22.6L37.2 26L33.8 27.6L31.2 25C30.7 27.4 31.4 30 33.2 31.8C35 33.6 37.6 34.3 40 33.8L45.8 39.6C46.4 40.2 47.4 40.2 48 39.6C48.6 39 48.6 38 48 37.4L42.2 31.6C43.5 29.2 43.5 25.8 43 22Z" fill="url(#lg2)"/>
+            <defs>
+              <linearGradient id="lg1" x1="0" y1="0" x2="72" y2="72" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#FF6B35"/><stop offset="100%" stop-color="#FF9F1C"/></linearGradient>
+              <linearGradient id="lg2" x1="30" y1="19" x2="48" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#FF6B35"/><stop offset="100%" stop-color="#FF9F1C"/></linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <div class="geo-tag">&#128205; <span id="cidade-atual">Detectando localização...</span></div>
+          <h1 style="font-size:22px;">Serviços<span style="color:#FF6B35;">Perto</span></h1>
+        </div>
+      </div>
+      <button class="avatar-btn">&#128100;</button>
+    </div>
+  </div>
+  <div class="search-bar" onclick="ir('tela-busca')">
+    <span>&#128269;</span>
+    <span>Buscar serviço ou profissional...</span>
+  </div>
+  <div class="banner">
+    <p>&#9989; Profissionais verificados e avaliados</p>
+    <h2>Encontre quem você precisa, perto de você</h2>
+    <button class="btn-banner" onclick="ir('tela-busca')">Buscar agora &rarr;</button>
+  </div>
+  <div class="secao-titulo">
+    <h3>Categorias</h3>
+    <a onclick="ir('tela-busca')">Ver todas &rarr;</a>
+  </div>
+  <div class="cats-grid" id="cats-grid"></div>
+  <div class="secao-titulo">
+    <h3>Perto de você</h3>
+    <a onclick="ir('tela-busca')">Ver todos &rarr;</a>
+  </div>
+  <div class="lista-pros" id="home-lista"></div>
+</div>
+
+<!-- BUSCA -->
+<div class="tela" id="tela-busca">
+  <div class="busca-header">
+    <h2>Buscar Profissionais</h2>
+    <div class="input-busca">
+      <span>&#128269;</span>
+      <input type="text" id="input-busca" placeholder="Nome ou profissao..."/>
+    </div>
+    <div class="filtros" id="filtros-cats"></div>
+  </div>
+  <p class="geo-info" id="geo-info">&#128205; Carregando profissionais...</p>
+  <div class="lista-pros" id="busca-lista"></div>
+</div>
+
+<!-- PERFIL -->
+<div class="tela" id="tela-perfil">
+  <div class="perfil-header" id="perfil-header">
+    <button class="back-btn" onclick="voltarBusca()">&#8592;</button>
+    <div class="perfil-top">
+      <div class="perfil-avatar" id="perfil-avatar"></div>
+      <div>
+        <div class="perfil-nome" id="perfil-nome"></div>
+        <div class="perfil-role" id="perfil-role"></div>
+        <div id="perfil-status"></div>
+      </div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-val" id="st-rating" style="color:#FFD700"></div><div class="stat-lbl">Avaliacao</div></div>
+    <div class="stat-box"><div class="stat-val" id="st-reviews" style="color:#FF6B35"></div><div class="stat-lbl">Reviews</div></div>
+    <div class="stat-box"><div class="stat-val" id="st-dist" style="color:#2EC4B6"></div><div class="stat-lbl">Distancia</div></div>
+  </div>
+  <div class="secao-card"><h4>Especialidades</h4><div class="pro-tags" id="perfil-tags"></div></div>
+  <div class="secao-card"><h4>&#128247; Portfolio de Trabalhos</h4><div class="galeria-scroll" id="perfil-galeria"></div></div>
+  <div class="secao-card"><h4>&#127909; Videos de Trabalhos</h4><div class="galeria-scroll" id="perfil-videos"></div></div>
+  <div class="secao-card"><h4>Avaliações recentes</h4><div id="perfil-avaliacoes"></div></div>
+  <button class="btn-contato" id="btn-contato">&#128242; Entrar em contato</button>
+</div>
+
+<!-- CADASTRO -->
+<div class="tela" id="tela-cadastro">
+  <div class="cad-header">
+    <h2>Seja um Profissional</h2>
+    <p>Cadastro 100% gratuito &bull; Comece a receber clientes hoje</p>
+  </div>
+  <div class="cad-aviso">&#9989; Seus dados ficam protegidos e seguros</div>
+  <div class="campo"><label>Nome Completo *</label><input type="text" id="c-nome" placeholder="Seu nome"/></div>
+  <div class="campo"><label>Profissão / Especialidade *</label><select id="c-profissao"><option value="">Selecione sua profissão...</option></select></div>
+  <div class="campo"><label>WhatsApp *</label><input type="tel" id="c-tel" placeholder="(00) 00000-0000"/></div>
+  <div class="campo"><label>Cidade *</label><input type="text" id="c-cidade" placeholder="Sua cidade"/></div>
+  <div class="campo"><label>Bairro</label><input type="text" id="c-bairro" placeholder="Seu bairro"/></div>
+  <div class="campo"><label>Valor cobrado</label><input type="text" id="c-valor" placeholder="Ex: R$ 80/hora ou R$ 200 por diaria"/></div>
+  <div class="campo"><label>Sobre você</label><textarea id="c-sobre" placeholder="Conte sobre sua experiência e servicos..."></textarea></div>
+  <div class="foto-upload"><p>&#128247;</p><p>Toque para adicionar sua foto de perfil</p></div>
+  <button class="btn-cadastrar" onclick="cadastrar()">Criar meu perfil gratis &rarr;</button>
+</div>
+
+<!-- MODAL FOTO -->
+<div class="modal-foto" id="modal-foto">
+  <button class="modal-foto-close" onclick="fecharFoto()">&#10005;</button>
+  <div class="modal-foto-img" id="modal-foto-img"></div>
+  <div class="modal-foto-desc" id="modal-foto-desc"></div>
+  <div class="modal-foto-sub" id="modal-foto-sub"></div>
+</div>
+
+<!-- MODAL SUCESSO -->
+<div class="modal-overlay" id="modal-sucesso">
+  <div class="modal-box">
+    <div class="emoji">&#127881;</div>
+    <h3>Cadastro realizado!</h3>
+    <p>Seu perfil foi criado com sucesso. Em breve clientes da sua regiao vao te encontrar!</p>
+    <button class="modal-btn" onclick="fecharModal()">Ver meu perfil &rarr;</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav-bottom">
+  <button class="nav-btn ativo" id="nav-home" onclick="ir('tela-home')"><span class="icone">🏠</span><span class="label">Início</span></button>
+  <button class="nav-btn" id="nav-busca" onclick="ir('tela-busca')"><span class="icone">🔍</span><span class="label">Buscar</span></button>
+  <button class="nav-btn" id="nav-favoritos" onclick="ir('tela-favoritos')"><span class="icone">❤️</span><span class="label">Favoritos</span></button>
+  <button class="nav-btn" id="nav-mensagens" onclick="ir('tela-mensagens')"><span class="icone">💬</span><span class="label">Mensagens</span></button>
+  <button class="nav-btn" id="nav-pedidos" onclick="ir('tela-pedidos')"><span class="icone">📋</span><span class="label">Pedidos</span></button>
+  <button class="nav-btn" id="nav-avaliacao" onclick="ir('tela-avaliacao')"><span class="icone">⭐</span><span class="label">Avaliações</span></button>
+  <button class="nav-btn" id="nav-perfil" onclick="ir('tela-perfil')"><span class="icone">👤</span><span class="label">Perfil</span></button>
+  <button class="nav-btn" id="nav-cadastro" onclick="ir('tela-cadastro')"><span class="icone">➕</span><span class="label">Cadastro</span></button>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+var SUPABASE_URL = 'https://ezwfyawsxybkqrvkpfiq.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6d2Z5YXdzeHlia3FydmtwZmlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NjE0ODAsImV4cCI6MjA5NjUzNzQ4MH0.YnFIq0ekneoL26TFrf6IHbbCos6QNjQY2yz4rc8OAnE';
+var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
+<script>
+var todasCats = [
+  {nome:"Eletricista",icone:"⚡",cor:"#FF6B35"},
+  {nome:"Pedreiro",icone:"🔨",cor:"#E71D36"},
+  {nome:"Pintor",icone:"🎨",cor:"#2EC4B6"},
+  {nome:"Encanador",icone:"🔧",cor:"#6A0572"},
+  {nome:"Costureira",icone:"🧵",cor:"#FF9F1C"},
+  {nome:"Funileiro",icone:"🚗",cor:"#2196F3"},
+  {nome:"Marceneiro",icone:"🪵",cor:"#8B4513"},
+  {nome:"Jardineiro",icone:"🌱",cor:"#2E7D32"},
+  {nome:"Diarista",icone:"🧹",cor:"#00ACC1"},
+  {nome:"Mecânico",icone:"🔩",cor:"#455A64"},
+  {nome:"Cuidador(a)",icone:"❤️",cor:"#E91E63"},
+  {nome:"Cozinheiro",icone:"👨‍🍳",cor:"#F57C00"},
+  {nome:"Fotógrafo(a)",icone:"📷",cor:"#7B1FA2"},
+  {nome:"Designer",icone:"✏️",cor:"#0288D1"},
+  {nome:"Manicure",icone:"💅",cor:"#D81B60"},
+  {nome:"Barbeiro",icone:"✂️",cor:"#1565C0"},
+  {nome:"Massagista",icone:"💆",cor:"#00796B"},
+  {nome:"Personal Trainer",icone:"💪",cor:"#E64A19"},
+  {nome:"Professor(a)",icone:"📚",cor:"#558B2F"},
+  {nome:"Motorista",icone:"🚘",cor:"#37474F"},
+  {nome:"Segurança",icone:"🛡️",cor:"#263238"},
+  {nome:"Veterinário(a)",icone:"🐾",cor:"#4CAF50"},
+  {nome:"Contador(a)",icone:"📊",cor:"#0097A7"},
+  {nome:"Arquiteto",icone:"🏛️",cor:"#546E7A"},
+  {nome:"Nutricionista",icone:"🥗",cor:"#66BB6A"},
+  {nome:"Psicólogo(a)",icone:"🧠",cor:"#AB47BC"},
+  {nome:"Decorador(a)",icone:"🛋️",cor:"#FFA726"},
+  {nome:"DJ",icone:"🎵",cor:"#EC407A"},
+  {nome:"Advogado(a)",icone:"⚖️",cor:"#5D4037"},
+  {nome:"Pintor Automotivo",icone:"🖌️",cor:"#00838F"}
+];
+
+var profissionais = [
+  {id:1,nome:"Carlos Mendes",profissao:"Eletricista",cidade:"Sao Paulo",bairro:"Centro",tel:"11999990001",avaliacao:4.9,reviews:127,online:true,avatar:"CM",cor:"#FF6B35",tags:["Residencial","Comercial","Emergencia"],valor:"R$ 80/h",sobre:"10 anos de experiencia em instalacoes eletricas residenciais e comerciais.",dist:"0.3 km",
+    fotos:[
+      {emoji:"⚡",bg:"#FF6B3522",desc:"Instalação elétrica",detalhe:"Quadro de distribuicao renovado"},
+      {emoji:"🔌",bg:"#FF9F1C22",desc:"Tomadas e interruptores",detalhe:"Instalacao de tomadas embutidas"},
+      {emoji:"💡",bg:"#FFD70022",desc:"Iluminacao LED",detalhe:"Projeto de iluminacao completo"},
+      {emoji:"🏠",bg:"#FF6B3533",desc:"Reforma eletrica",detalhe:"Casa totalmente reformada"}
+    ],
+    videos:[
+      {thumb:"▶️",titulo:"Instalacao de quadro eletrico",duracao:"2:34"},
+      {thumb:"▶️",titulo:"Projeto de iluminacao LED",duracao:"1:58"},
+      {thumb:"▶️",titulo:"Fiacao completa residencial",duracao:"3:12"}
+    ],
+    avaliacoes:[{nome:"Maria C.",stars:5,txt:"Excelente! Resolveu tudo rapido e com cuidado."},{nome:"Paulo R.",stars:5,txt:"Super profissional, preco justo. Recomendo!"}]},
+  {id:2,nome:"Ana Paula Silva",profissao:"Pintora",cidade:"Sao Paulo",bairro:"Vila Madalena",tel:"11999990002",avaliacao:4.8,reviews:89,online:true,avatar:"AP",cor:"#2EC4B6",tags:["Interno","Externo","Textura"],valor:"R$ 60/h",sobre:"Pintora com 7 anos de experiencia em ambientes residenciais.",dist:"0.7 km",
+    fotos:[
+      {emoji:"🎨",bg:"#2EC4B622",desc:"Pintura de sala",detalhe:"Acabamento texturizado premium"},
+      {emoji:"🏡",bg:"#2EC4B633",desc:"Fachada externa",detalhe:"Pintura impermeabilizada"},
+      {emoji:"✨",bg:"#2EC4B622",desc:"Quarto infantil",detalhe:"Tema personalizado"},
+      {emoji:"🖌️",bg:"#00C89622",desc:"Pintura artistica",detalhe:"Grafite decorativo interno"}
+    ],
+    videos:[
+      {thumb:"▶️",titulo:"Pintura de sala com textura",duracao:"2:10"},
+      {thumb:"▶️",titulo:"Reforma de fachada externa",duracao:"1:45"},
+      {thumb:"▶️",titulo:"Quarto infantil tematico",duracao:"2:55"}
+    ],
+    avaliacoes:[{nome:"Joana F.",stars:5,txt:"Ficou lindo! Muito caprichosa e pontual."},{nome:"Roberto S.",stars:4,txt:"Otimo trabalho, recomendo!"}]},
+  {id:3,nome:"Roberto Souza",profissao:"Pedreiro",cidade:"Sao Paulo",bairro:"Mooca",tel:"11999990003",avaliacao:4.7,reviews:203,online:false,avatar:"RS",cor:"#E71D36",tags:["Reforma","Construcao","Alvenaria"],valor:"R$ 90/h",sobre:"Mestre de obras com 15 anos de experiencia.",dist:"1.1 km",
+    fotos:[
+      {emoji:"🏗️",bg:"#E71D3622",desc:"Alvenaria estrutural",detalhe:"Construcao de muro de arrimo"},
+      {emoji:"🚿",bg:"#E71D3633",desc:"Reforma de banheiro",detalhe:"Banheiro completo reformado"},
+      {emoji:"🧱",bg:"#E71D3622",desc:"Revestimento ceramico",detalhe:"Assentamento de porcelanato"},
+      {emoji:"🏠",bg:"#E71D3615",desc:"Construcao nova",detalhe:"Fundacao e estrutura"}
+    ],
+    videos:[
+      {thumb:"▶️",titulo:"Reforma de banheiro completa",duracao:"3:40"},
+      {thumb:"▶️",titulo:"Assentamento de porcelanato",duracao:"2:20"},
+      {thumb:"▶️",titulo:"Construcao de muro",duracao:"1:50"}
+    ],
+    avaliacoes:[{nome:"Carlos M.",stars:5,txt:"Fez uma reforma incrivel no meu banheiro."},{nome:"Ana L.",stars:4,txt:"Muito bom profissional, trabalho de qualidade."}]},
+  {id:4,nome:"Marcia Oliveira",profissao:"Costureira",cidade:"Sao Paulo",bairro:"Pinheiros",tel:"11999990004",avaliacao:5.0,reviews:56,online:true,avatar:"MO",cor:"#FF9F1C",tags:["Roupas","Ajustes","Uniformes"],valor:"R$ 50/h",sobre:"Especialista em ajustes e confeccao de roupas sob medida.",dist:"1.4 km",
+    fotos:[
+      {emoji:"👗",bg:"#FF9F1C22",desc:"Vestido sob medida",detalhe:"Vestido de festa confeccionado"},
+      {emoji:"🧵",bg:"#FF9F1C33",desc:"Ajuste de roupa",detalhe:"Calca ajustada perfeitamente"},
+      {emoji:"👔",bg:"#FF9F1C22",desc:"Uniformes corporativos",detalhe:"Lote de 20 uniformes"},
+      {emoji:"✂️",bg:"#FF6B3522",desc:"Costura artesanal",detalhe:"Peca exclusiva"}
+    ],
+    videos:[
+      {thumb:"▶️",titulo:"Vestido de festa sob medida",duracao:"1:30"},
+      {thumb:"▶️",titulo:"Ajuste de terno masculino",duracao:"2:05"},
+      {thumb:"▶️",titulo:"Confeccao de uniformes",duracao:"2:40"}
+    ],
+    avaliacoes:[{nome:"Lucia B.",stars:5,txt:"Ajustou meu vestido perfeitamente!"},{nome:"Fernanda T.",stars:5,txt:"Otima costureira, super cuidadosa."}]},
+  {id:5,nome:"Joao Ferreira",profissao:"Encanador",cidade:"Sao Paulo",bairro:"Ipiranga",tel:"11999990005",avaliacao:4.6,reviews:144,online:true,avatar:"JF",cor:"#6A0572",tags:["Vazamentos","Instalacao","Desentupimento"],valor:"R$ 85/h",sobre:"Encanador com experiencia em reparos e instalacoes hidraulicas.",dist:"1.8 km",
+    fotos:[
+      {emoji:"🔧",bg:"#6A057222",desc:"Reparo de vazamento",detalhe:"Cano substituido sem quebrar"},
+      {emoji:"🚰",bg:"#6A057233",desc:"Instalação de torneira",detalhe:"Torneira de cozinha instalada"},
+      {emoji:"🪠",bg:"#6A057222",desc:"Desentupimento",detalhe:"Esgoto desobstruido"},
+      {emoji:"🏊",bg:"#2196F322",desc:"Encanamento de piscina",detalhe:"Sistema hidraulico completo"}
+    ],
+    videos:[
+      {thumb:"▶️",titulo:"Reparo de vazamento",duracao:"1:20"},
+      {thumb:"▶️",titulo:"Instalação de torneira",duracao:"1:45"},
+      {thumb:"▶️",titulo:"Desentupimento de esgoto",duracao:"2:00"}
+    ],
+    avaliacoes:[{nome:"Marcos P.",stars:5,txt:"Resolveu o vazamento rapidinho!"},{nome:"Silvia A.",stars:4,txt:"Bom atendimento, preco razoavel."}]},
+  {id:6,nome:"Pedro Lima",profissao:"Funileiro",cidade:"Sao Paulo",bairro:"Tatuale",tel:"11999990006",avaliacao:4.5,reviews:78,online:false,avatar:"PL",cor:"#2196F3",tags:["Carros","Lataria","Pintura auto"],valor:"R$ 100/h",sobre:"Funileiro automotivo com 12 anos de experiencia.",dist:"2.1 km",
+    fotos:[
+      {emoji:"🚗",bg:"#2196F322",desc:"Funilaria completa",detalhe:"Lataria restaurada sem solda"},
+      {emoji:"🎨",bg:"#2196F333",desc:"Pintura automotiva",detalhe:"Pintura metalizada premium"},
+      {emoji:"🔨",bg:"#2196F322",desc:"Amassado removido",detalhe:"Tecnica sem pintura PDR"},
+      {emoji:"✨",bg:"#2196F315",desc:"Polimento",detalhe:"Polimento vitrificado"}
+    ],
+    videos:[
+      {thumb:"▶️",titulo:"Funilaria sem solda",duracao:"3:10"},
+      {thumb:"▶️",titulo:"Pintura automotiva metalizada",duracao:"2:30"},
+      {thumb:"▶️",titulo:"Polimento vitrificado",duracao:"1:55"}
+    ],
+    avaliacoes:[{nome:"Bruno K.",stars:5,txt:"Fez um servico impecavel no meu carro."},{nome:"Clara N.",stars:4,txt:"Muito bom, entregou no prazo combinado."}]}
+];
+
+var catAtiva = "Todos";
+var cats = ["Todos"];
+for(var i=0;i<todasCats.length;i++){ cats.push(todasCats[i].nome); }
+
+function ir(tela){
+  var telas = document.querySelectorAll('.tela');
+  for(var i=0;i<telas.length;i++) telas[i].classList.remove('ativa');
+  document.getElementById(tela).classList.add('ativa');
+  var btns = document.querySelectorAll('.nav-btn');
+  for(var i=0;i<btns.length;i++) btns[i].classList.remove('ativo');
+  var mapa = {'tela-home':'nav-home','tela-busca':'nav-busca','tela-cadastro':'nav-cadastro'};
+  if(mapa[tela]) document.getElementById(mapa[tela]).classList.add('ativo');
+  window.scrollTo(0,0);
+  if(tela==='tela-busca') renderBusca();
+}
+
+function voltarBusca(){ ir('tela-busca'); }
+
+navigator.geolocation && navigator.geolocation.getCurrentPosition(function(pos){
+  document.getElementById('cidade-atual').textContent = 'Localizacao ativa';
+}, function(){
+  document.getElementById('cidade-atual').textContent = 'Sao Paulo, SP';
+});
+
+function cardHTML(p){
+  return '<div class="pro-card" onclick="verPerfil('+p.id+')">'
+    +'<div class="pro-card-top">'
+    +'<div class="pro-avatar" style="background:'+p.cor+'33;color:'+p.cor+'">'+p.avatar+(p.online?'<div class="online-dot"></div>':'')+'</div>'
+    +'<div class="pro-info"><h4>'+p.nome+'</h4><p>'+p.profissao+' &bull; '+p.dist+'</p>'
+    +'<div class="stars">&#9733; '+p.avaliacao+' <span>('+p.reviews+' avaliacoes)</span></div></div>'
+    +'<div class="pro-preco">'+p.valor+'</div></div>'
+    +'<div class="pro-tags">'
+    +p.tags.map(function(t){ return '<span class="tag" style="background:'+p.cor+'22;color:'+p.cor+'">'+t+'</span>'; }).join('')
+    +'<span class="tag" style="background:'+(p.online?'#00C89622':'#ffffff11')+';color:'+(p.online?'#00C896':'#666')+'">'+(p.online?'&#9679; Online':'&#9675; Offline')+'</span>'
+    +'</div></div>';
+}
+
+function renderHome(){
+  var html = '';
+  for(var i=0;i<4&&i<profissionais.length;i++) html += cardHTML(profissionais[i]);
+  document.getElementById('home-lista').innerHTML = html;
+}
+
+function renderCatsHome(){
+  var el = document.getElementById('cats-grid');
+  if(!el) return;
+  var html = '';
+  for(var i=0;i<12&&i<todasCats.length;i++){
+    var c = todasCats[i];
+    html += '<div class="cat-card" onclick="filtrarCat(\''+c.nome+'\')">'
+      +'<div class="cat-icon" style="background:'+c.cor+'22">'+c.icone+'</div>'
+      +'<span>'+c.nome+'</span></div>';
+  }
+  el.innerHTML = html;
+}
+
+function popularSelect(){
+  var sel = document.getElementById('c-profissao');
+  if(!sel) return;
+  for(var i=0;i<todasCats.length;i++){
+    var opt = document.createElement('option');
+    opt.value = todasCats[i].nome;
+    opt.textContent = todasCats[i].icone+' '+todasCats[i].nome;
+    sel.appendChild(opt);
+  }
+  var outro = document.createElement('option');
+  outro.value = 'Outro';
+  outro.textContent = '+ Outro';
+  sel.appendChild(outro);
+}
+
+function renderFiltros(){
+  var html = '';
+  for(var i=0;i<cats.length;i++){
+    html += '<button class="filtro-btn'+(catAtiva===cats[i]?' ativo':'')+'" onclick="setCat(\''+cats[i]+'\')">'+(cats[i]==='Todos'?'&#127775; ':'')+cats[i]+'</button>';
+  }
+  document.getElementById('filtros-cats').innerHTML = html;
+}
+
+function setCat(cat){ catAtiva = cat; renderBusca(); }
+function filtrarCat(cat){ catAtiva = cat; ir('tela-busca'); }
+
+function renderBusca(){
+  renderFiltros();
+  var q = (document.getElementById('input-busca')||{value:''}).value.toLowerCase();
+  var filtrados = profissionais.filter(function(p){
+    var matchCat = catAtiva==='Todos' || p.profissao.toLowerCase().indexOf(catAtiva.toLowerCase())>=0;
+    var matchQ = !q || p.nome.toLowerCase().indexOf(q)>=0 || p.profissao.toLowerCase().indexOf(q)>=0;
+    return matchCat && matchQ;
+  });
+  document.getElementById('geo-info').textContent = '&#128205; '+filtrados.length+' profissional(is) encontrado(s) perto de voce';
+  var html = '';
+  for(var i=0;i<filtrados.length;i++) html += cardHTML(filtrados[i]);
+  document.getElementById('busca-lista').innerHTML = html;
+  document.getElementById('input-busca').oninput = renderBusca;
+}
+
+function verPerfil(id){
+  var p = null;
+  for(var i=0;i<profissionais.length;i++){ if(profissionais[i].id===id){ p=profissionais[i]; break; } }
+  if(!p) return;
+  document.getElementById('perfil-avatar').textContent = p.avatar;
+  document.getElementById('perfil-avatar').style.cssText = 'width:76px;height:76px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:26px;background:'+p.cor+'33;color:'+p.cor+';border:2px solid '+p.cor;
+  document.getElementById('perfil-nome').textContent = p.nome;
+  document.getElementById('perfil-role').textContent = p.profissao;
+  document.getElementById('perfil-status').innerHTML = p.online
+    ? '<span style="color:#00C896;font-size:12px;font-weight:700">&#9679; Disponível agora</span>'
+    : '<span style="color:#666;font-size:12px">&#9675; Offline</span>';
+  document.getElementById('st-rating').textContent = '&#9733; '+p.avaliacao;
+  document.getElementById('st-reviews').textContent = p.reviews;
+  document.getElementById('st-dist').textContent = p.dist;
+  document.getElementById('perfil-tags').innerHTML = p.tags.map(function(t){
+    return '<span class="tag" style="background:'+p.cor+'22;color:'+p.cor+'">'+t+'</span>';
+  }).join('');
+  document.getElementById('perfil-galeria').innerHTML = p.fotos.map(function(f,i){
+    return '<div class="galeria-foto" onclick="abrirFoto('+p.id+','+i+')">'
+      +'<div class="foto-bg" style="background:'+f.bg+'">'+f.emoji+'</div>'
+      +'<div class="foto-label">'+f.desc+'</div></div>';
+  }).join('');
+  document.getElementById('perfil-videos').innerHTML = p.videos.map(function(v){
+    return '<div class="video-card" onclick="alert(\'Video: '+v.titulo+'\')">'
+      +'<div class="video-play">'+v.thumb+'</div>'
+      +'<div class="video-titulo">'+v.titulo+'</div>'
+      +'<div class="video-duracao">'+v.duracao+'</div></div>';
+  }).join('');
+  document.getElementById('perfil-avaliacoes').innerHTML = p.avaliacoes.map(function(a,i){
+    return '<div class="avaliacao-item">'
+      +'<div class="av-top"><span class="av-nome">'+a.nome+'</span><span style="color:#FFD700;font-size:12px">'+('&#9733;&#9733;&#9733;&#9733;&#9733;'.substring(0,a.stars*8))+'</span></div>'
+      +'<p class="av-txt">'+a.txt+'</p></div>';
+  }).join('');
+  document.getElementById('btn-contato').textContent = 'WhatsApp: '+p.valor;
+  document.getElementById('btn-contato').onclick = function(){
+    window.open('https://wa.me/55'+p.tel.replace(/\D/g,'')+'?text=Ola '+p.nome+'! Vi seu perfil no ServicoPerto e gostaria de contratar.','_blank');
+  };
+  document.getElementById('perfil-header').style.background = 'linear-gradient(160deg,'+p.cor+'33 0%,var(--fundo) 100%)';
+  ir('tela-perfil');
+}
+
+function abrirFoto(proId, fotoIdx){
+  var p = null;
+  for(var i=0;i<profissionais.length;i++){ if(profissionais[i].id===proId){ p=profissionais[i]; break; } }
+  var f = p.fotos[fotoIdx];
+  var img = document.getElementById('modal-foto-img');
+  img.style.background = f.bg;
+  img.style.fontSize = '90px';
+  img.textContent = f.emoji;
+  document.getElementById('modal-foto-desc').textContent = f.desc;
+  document.getElementById('modal-foto-sub').textContent = f.detalhe;
+  document.getElementById('modal-foto').classList.add('ativo');
+}
+
+function fecharFoto(){
+  document.getElementById('modal-foto').classList.remove('ativo');
+}
+
+function cadastrar(){
+  var nome = document.getElementById('c-nome').value.trim();
+  var prof = document.getElementById('c-profissao').value;
+  var tel = document.getElementById('c-tel').value.trim();
+  var cidade = document.getElementById('c-cidade').value.trim();
+  var bairro = document.getElementById('c-bairro').value.trim();
+  var valor = document.getElementById('c-valor').value.trim();
+  var sobre = document.getElementById('c-sobre').value.trim();
+  if(!nome||!prof||!tel||!cidade){ alert('Preencha os campos obrigatorios (*)'); return; }
+  
+  var btn = document.querySelector('.btn-cadastrar');
+  btn.textContent = 'Salvando...';
+  btn.disabled = true;
+
+  supabase.from('profissionais').insert([{
+    nome: nome,
+    profissao: prof,
+    telefone: tel,
+    cidade: cidade,
+    bairro: bairro,
+    valor: valor,
+    sobre: sobre
+  }]).then(function(result){
+    btn.textContent = 'Criar meu perfil gratis';
+    btn.disabled = false;
+    if(result.error){
+      alert('Erro ao salvar: ' + result.error.message);
+    } else {
+      document.getElementById('c-nome').value = '';
+      document.getElementById('c-profissao').value = '';
+      document.getElementById('c-tel').value = '';
+      document.getElementById('c-cidade').value = '';
+      document.getElementById('c-bairro').value = '';
+      document.getElementById('c-valor').value = '';
+      document.getElementById('c-sobre').value = '';
+      document.getElementById('modal-sucesso').classList.add('ativo');
+    }
+  });
+}
+
+function fecharModal(){
+  document.getElementById('modal-sucesso').classList.remove('ativo');
+  ir('tela-home');
+}
+
+renderCatsHome();
+popularSelect();
+renderHome();
+renderFiltros();
+renderBusca();
+</script>
+</body>
+</html>
